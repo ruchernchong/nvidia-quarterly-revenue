@@ -6,10 +6,16 @@
 pip install -r requirements.txt
 ```
 
-## Running
+## Usage
 
 ```bash
 python main.py
+```
+
+## Testing
+
+```bash
+pytest
 ```
 
 ## Quarterly Revenue Trend
