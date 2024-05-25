@@ -12,4 +12,6 @@ pip install -r requirements.txt
 python main.py
 ```
 
+## Quarterly Revenue Trend
+
 ![Nvidia Revenue Trend](nvidia-revenue-trend.png)
