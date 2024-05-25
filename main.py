@@ -1,3 +1,5 @@
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -6,7 +8,7 @@ from utils.calculate_growth_rate import calculate_growth_rate
 from utils.replace_text import replace_text
 
 # Step 1: Extract data from the PDF
-data = read_pdf.extract_data_from_pdf('Rev_by_Mkt_Qtrly_Trend_Q125.pdf')
+data = read_pdf.extract_data_from_pdf(sys.argv[1])
 
 # Step 2: Assign data to variables
 quarters = data['quarters']
