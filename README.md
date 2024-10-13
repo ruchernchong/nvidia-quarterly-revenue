@@ -3,13 +3,19 @@
 ## Installation
 
 ```bash
+poetry install
+```
+
+OR
+
+```bash
 pip install -r requirements.txt
 ```
 
 ## Usage
 
 ```bash
-python main.py
+python main.py <PDF File>
 ```
 
 ## Testing
