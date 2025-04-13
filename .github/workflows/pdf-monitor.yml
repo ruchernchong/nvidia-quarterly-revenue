@@ -4,39 +4,21 @@ on:
   push:
     paths:
       - '**/*.pdf'
+  workflow_dispatch:
 
 jobs:
-  run-python-script:
+  pdf-updater:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: 3.12
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
+          version: latest
 
       - name: Find Changed PDF Files
-        id: find_pdfs
         run: |
           if [ $(git rev-parse --is-shallow-repository) = true ]; then
             # For shallow clones, fetch the full history
@@ -50,17 +32,23 @@ jobs:
             # For subsequent commits, list changed PDFs
             pdf_files=$(git diff --name-only HEAD^ HEAD | grep '.pdf$')
           fi
+
+          if [ -z "$pdf_files" ]; then
+            echo "No changed PDF files found. Exiting workflow."
+            exit 0
+          fi
+
           echo "pdf_files=$pdf_files" >> $GITHUB_ENV
 
       - name: Run Python Script
         if: env.pdf_files != ''
         run: |
           for pdf_file in ${{ env.pdf_files }}; do
-            poetry run python main.py "$pdf_file"
+            uv run main.py "$pdf_file"
           done
 
       - name: Commit and Push Changes
-        if: ${{ env.pdf_files != '' }}
+        if: env.pdf_files != ''
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
