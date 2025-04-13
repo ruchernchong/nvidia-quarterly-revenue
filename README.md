@@ -3,13 +3,13 @@
 ## Installation
 
 ```bash
-poetry install
+uv pip install -e .
 ```
 
-OR
+Or with development dependencies:
 
 ```bash
-pip install -r requirements.txt
+uv pip install -e ".[dev]"
 ```
 
 ## Usage
@@ -21,7 +21,13 @@ python main.py <PDF File>
 ## Testing
 
 ```bash
-pytest
+uv run pytest
+```
+
+## Formatting
+
+```bash
+black .
 ```
 
 ## Quarterly Revenue Trend
