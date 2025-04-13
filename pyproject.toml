@@ -15,4 +15,5 @@ dependencies = [
 dev = [
     "black>=24.10.0,<25",
     "pre-commit>=4.0.1,<5",
+    "pytest>=8.3.5",
 ]
