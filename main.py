@@ -43,83 +43,87 @@ growth_rates = [
 for quarter, rate in zip(quarters[1:], growth_rates[1:]):
     print(f"{quarter}: {rate}%")
 
-# Step 5: Plotting
+# Step 5: Plotting - Stacked bars with total revenue line
 x = np.arange(len(quarters))  # the label locations
-# Add spacing between quarters by scaling x positions
-spacing_factor = 1.6  # Increase this to add more space between quarters
-x = x * spacing_factor
-width = 0.15  # the width of the bars
-bar_positions = [x - 2 * width, x - width, x, x + width, x + 2 * width, x + 3 * width]
-bar_labels = [
+width = 0.6  # the width of the bars
+
+# Segment data for stacking (exclude total)
+segment_labels = [
     "data_center",
     "gaming",
     "professional_visualization",
     "auto",
     "oem_other",
-    "total",
 ]
-bar_data = [data_center, gaming, professional_visualization, auto, oem_other, total]
+segment_data = [data_center, gaming, professional_visualization, auto, oem_other]
 
-# Dynamic figure width: 2.5 inches per quarter, minimum 14 inches
-fig_width = max(14, len(quarters) * 2.5)
+# Dynamic figure width: 3 inches per quarter, minimum 12 inches
+fig_width = max(12, len(quarters) * 3)
 fig, ax = plt.subplots(figsize=(fig_width, 8))
 
-rects = []
-for pos, label, data in zip(bar_positions, bar_labels, bar_data):
-    rect = ax.bar(pos, data, width, label=replace_text(label))
-    rects.append(rect)
+# Create stacked bars
+bottom = np.zeros(len(quarters))
+bars = []
+for label, data in zip(segment_labels, segment_data):
+    bar = ax.bar(x, data, width, label=replace_text(label), bottom=bottom)
+    bars.append(bar)
+    bottom += data
 
-# Add value labels on bars (except total, which has growth rate labels)
-for idx, (pos, label, data) in enumerate(zip(bar_positions[:-1], bar_labels[:-1], bar_data[:-1])):
-    for i, value in enumerate(data):
-        # Format large numbers with commas
-        label_text = f"${value:,}" if value >= 1000 else f"${value}"
-        ax.text(
-            pos[i],
-            value + 500,  # Position slightly above the bar
-            label_text,
-            ha="center",
-            va="bottom",
-            fontsize=7,
-            rotation=90,
-            alpha=0.8
-        )
+# Step 6: Add total revenue as a line overlay
+ax2 = ax.twinx()  # Create second y-axis
+line = ax2.plot(
+    x,
+    total,
+    color="#2E2E2E",
+    marker="o",
+    linewidth=3,
+    markersize=8,
+    label="Total Revenue",
+    zorder=5
+)
+# Make both y-axes have the same scale
+ax2.set_ylim(ax.get_ylim())
+ax2.set_ylabel("Total Revenue ($ in millions)", fontsize=12)
 
-# Step 6: Add growth rate annotations
+# Step 7: Add growth rate annotations on the line
 for i, rate in enumerate(growth_rates):
-    ax.annotate(
+    ax2.annotate(
         f"{rate}%",
         (x[i], total[i]),
         textcoords="offset points",
-        xytext=(0, 8),
+        xytext=(0, 15),
         ha="center",
-        fontsize=9,
+        fontsize=10,
         fontweight="bold",
+        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="gray", alpha=0.8)
     )
 
-# Step 7: Add vertical dividers between quarter groups
-# Position dividers between quarters (after total bar and before next data_center bar)
-for i in range(1, len(quarters)):
-    divider_position = x[i] - 2 * width - width * 2.5  # Increased spacing from blue bar
-    ax.axvline(x=divider_position, color="gray", linestyle="--", linewidth=0.8, alpha=0.5)
-
-# Step 8: Add some text for labels, title, and custom x-axis tick labels, etc.
+# Step 8: Add labels, title, and styling
 ax.set_xlabel("Quarter", fontsize=12)
-ax.set_ylabel("Revenue ($ in millions)", fontsize=12)
-ax.set_title("NVIDIA Quarterly Revenue Trend by Market", fontsize=14, fontweight="bold")
+ax.set_ylabel("Revenue by Segment ($ in millions)", fontsize=12)
+ax.set_title("NVIDIA Quarterly Revenue: Segment Breakdown & Total Trend", fontsize=14, fontweight="bold")
 ax.set_xticks(x)
-ax.set_xticklabels(quarters, rotation=45, ha="right", fontsize=10)
-ax.legend(fontsize=10)
+ax.set_xticklabels(quarters, rotation=0, ha="center", fontsize=11)
+
+# Combine legends from both axes
+handles1, labels1 = ax.get_legend_handles_labels()
+handles2, labels2 = ax2.get_legend_handles_labels()
+ax.legend(handles1 + handles2, labels1 + labels2, loc="upper left", fontsize=10)
 
 # Adjust tick label size
 ax.tick_params(axis="y", labelsize=10)
+ax2.tick_params(axis="y", labelsize=10)
 
-# Set Y-axis ticks with smaller intervals for better visibility of smaller bars
+# Set Y-axis ticks with appropriate intervals
 max_value = max(total)
-y_ticks = np.arange(0, max_value + 5000, 2500)  # Intervals of 2,500
+y_ticks = np.arange(0, max_value + 5000, 5000)  # Intervals of 5,000
 ax.set_yticks(y_ticks)
+ax2.set_yticks(y_ticks)
+
+# Add grid for better readability
+ax.grid(axis="y", alpha=0.3, linestyle="--", linewidth=0.5)
 
 # Step 9: Adjust layout and save the figure
 fig.tight_layout()
-plt.savefig("nvidia-revenue-trend.png")
+plt.savefig("nvidia-revenue-trend.png", dpi=300, bbox_inches="tight")
 plt.show()
