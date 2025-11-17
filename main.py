@@ -23,6 +23,16 @@ auto = data["auto"]
 oem_other = data["oem_other"]
 total = data["total"]
 
+# Filter to show only the last 4 quarters for better readability
+max_quarters = 4
+quarters = quarters[-max_quarters:]
+data_center = data_center[-max_quarters:]
+gaming = gaming[-max_quarters:]
+professional_visualization = professional_visualization[-max_quarters:]
+auto = auto[-max_quarters:]
+oem_other = oem_other[-max_quarters:]
+total = total[-max_quarters:]
+
 # Step 3: Calculate growth rates as percentages with + or -
 growth_rates = [
     calculate_growth_rate(total[i], total[i - 1]) if i != 0 else 0
@@ -36,7 +46,7 @@ for quarter, rate in zip(quarters[1:], growth_rates[1:]):
 # Step 5: Plotting
 x = np.arange(len(quarters))  # the label locations
 # Add spacing between quarters by scaling x positions
-spacing_factor = 1.3  # Increase this to add more space between quarters
+spacing_factor = 1.6  # Increase this to add more space between quarters
 x = x * spacing_factor
 width = 0.15  # the width of the bars
 bar_positions = [x - 2 * width, x - width, x, x + width, x + 2 * width, x + 3 * width]
@@ -59,6 +69,22 @@ for pos, label, data in zip(bar_positions, bar_labels, bar_data):
     rect = ax.bar(pos, data, width, label=replace_text(label))
     rects.append(rect)
 
+# Add value labels on bars (except total, which has growth rate labels)
+for idx, (pos, label, data) in enumerate(zip(bar_positions[:-1], bar_labels[:-1], bar_data[:-1])):
+    for i, value in enumerate(data):
+        # Format large numbers with commas
+        label_text = f"${value:,}" if value >= 1000 else f"${value}"
+        ax.text(
+            pos[i],
+            value + 500,  # Position slightly above the bar
+            label_text,
+            ha="center",
+            va="bottom",
+            fontsize=7,
+            rotation=90,
+            alpha=0.8
+        )
+
 # Step 6: Add growth rate annotations
 for i, rate in enumerate(growth_rates):
     ax.annotate(
@@ -74,7 +100,7 @@ for i, rate in enumerate(growth_rates):
 # Step 7: Add vertical dividers between quarter groups
 # Position dividers between quarters (after total bar and before next data_center bar)
 for i in range(1, len(quarters)):
-    divider_position = x[i] - 2 * width - width / 2
+    divider_position = x[i] - 2 * width - width * 2.5  # Increased spacing from blue bar
     ax.axvline(x=divider_position, color="gray", linestyle="--", linewidth=0.8, alpha=0.5)
 
 # Step 8: Add some text for labels, title, and custom x-axis tick labels, etc.
@@ -87,6 +113,11 @@ ax.legend(fontsize=10)
 
 # Adjust tick label size
 ax.tick_params(axis="y", labelsize=10)
+
+# Set Y-axis ticks with smaller intervals for better visibility of smaller bars
+max_value = max(total)
+y_ticks = np.arange(0, max_value + 5000, 2500)  # Intervals of 2,500
+ax.set_yticks(y_ticks)
 
 # Step 9: Adjust layout and save the figure
 fig.tight_layout()
