@@ -11,6 +11,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Format code: `uv run black .`
 - Pre-commit hooks: `uv run pre-commit run --all-files`
 
+## Commit Message Style
+- **Always use the `/commit` slash command** for consistency
+- **Format**: Follow conventional commits (e.g., `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`)
+- **Case**: Use lowercase for the description after the prefix
+- **Punctuation**: No trailing periods
+- **Length**: Keep messages short and concise
+
+Examples:
+- `chore: release 0.3.1`
+- `fix: correct chart paths to charts directory`
+- `feat: add new revenue analysis function`
+
 ## Project Structure
 ```
 ├── main.py                # Main entry point
