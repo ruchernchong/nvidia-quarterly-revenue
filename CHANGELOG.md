@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.3.1 (2025-11-17)
+
+### Bug Fixes
+
+- Correct chart paths to charts directory
+  ([`d770368`](https://github.com/ruchernchong/nvidia-quarterly-revenue/commit/d770368769257de84dad5f1796648aa041212c57))
+
+
 ## v0.3.0 (2025-11-17)
 
 
