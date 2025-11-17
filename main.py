@@ -35,6 +35,9 @@ for quarter, rate in zip(quarters[1:], growth_rates[1:]):
 
 # Step 5: Plotting
 x = np.arange(len(quarters))  # the label locations
+# Add spacing between quarters by scaling x positions
+spacing_factor = 1.3  # Increase this to add more space between quarters
+x = x * spacing_factor
 width = 0.15  # the width of the bars
 bar_positions = [x - 2 * width, x - width, x, x + width, x + 2 * width, x + 3 * width]
 bar_labels = [
@@ -68,7 +71,13 @@ for i, rate in enumerate(growth_rates):
         fontweight="bold",
     )
 
-# Step 7: Add some text for labels, title, and custom x-axis tick labels, etc.
+# Step 7: Add vertical dividers between quarter groups
+# Position dividers between quarters (after total bar and before next data_center bar)
+for i in range(1, len(quarters)):
+    divider_position = x[i] - 2 * width - width / 2
+    ax.axvline(x=divider_position, color="gray", linestyle="--", linewidth=0.8, alpha=0.5)
+
+# Step 8: Add some text for labels, title, and custom x-axis tick labels, etc.
 ax.set_xlabel("Quarter", fontsize=12)
 ax.set_ylabel("Revenue ($ in millions)", fontsize=12)
 ax.set_title("NVIDIA Quarterly Revenue Trend by Market", fontsize=14, fontweight="bold")
@@ -79,7 +88,7 @@ ax.legend(fontsize=10)
 # Adjust tick label size
 ax.tick_params(axis="y", labelsize=10)
 
-# Step 8: Adjust layout and save the figure
+# Step 9: Adjust layout and save the figure
 fig.tight_layout()
 plt.savefig("nvidia-revenue-trend.png")
 plt.show()
