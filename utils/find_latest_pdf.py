@@ -24,12 +24,12 @@ def parse_quarter_year(filename: str) -> tuple[int, int]:
     return (0, 0)
 
 
-def get_latest_pdf(directory: str = ".") -> str:
+def get_latest_pdf(directory: str = "data") -> str:
     """
     Find the PDF file with the latest quarter/year.
 
     Args:
-        directory: Directory to search for PDF files (default: current directory)
+        directory: Directory to search for PDF files (default: data)
 
     Returns:
         Path to the latest PDF file as a string
