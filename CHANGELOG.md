@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.4.0 (2025-11-17)
+
+### Documentation
+
+- Add commit message style guide
+  ([`a307ea8`](https://github.com/ruchernchong/nvidia-quarterly-revenue/commit/a307ea88681ae7ab2ca1ab3a74b79ac41c5e3851))
+
+### Features
+
+- Add database storage and export
+  ([`bff28ab`](https://github.com/ruchernchong/nvidia-quarterly-revenue/commit/bff28abc0aacd44638e8bdd7ff8cf12fa18b30e5))
+
+
 ## v0.3.1 (2025-11-17)
 
 ### Bug Fixes
