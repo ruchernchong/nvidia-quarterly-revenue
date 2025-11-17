@@ -1,6 +1,6 @@
 # NVIDIA Quarterly Revenue
 
-![NVIDIA Revenue Trend](nvidia-revenue-trend.png)
+![NVIDIA Revenue Trend](charts/nvidia-revenue-trend.png)
 
 A Python tool that extracts and visualises NVIDIA's quarterly revenue data from PDF reports. The tool generates comprehensive charts showing revenue breakdown by market segment with growth rate trends.
 
@@ -54,39 +54,39 @@ The script generates:
 #### Generated Charts
 
 ### 1. Main Revenue Trend (Stacked Bar Chart)
-![NVIDIA Revenue Trend](nvidia-revenue-trend.png)
+![NVIDIA Revenue Trend](charts/nvidia-revenue-trend.png)
 *Stacked bars showing revenue by market segment with total revenue and data centre revenue trend lines with growth rate annotations*
 
 ### 2. Market Share Analysis
-![Market Share Chart](market_share_chart.png)
+![Market Share Chart](charts/market_share_chart.png)
 *Multi-panel pie/donut charts showing percentage breakdown by segment for each quarter - highlights Data Centre's growing dominance*
 
 ### 3. Market Share Evolution
-![Stacked Area Chart](stacked_area_chart.png)
+![Stacked Area Chart](charts/stacked_area_chart.png)
 *100% stacked area chart visualising relative proportion changes over time and segment market share shifts*
 
 ### 4. Individual Segment Trends
-![Segment Trends](segment_trends.png)
+![Segment Trends](charts/segment_trends.png)
 *Line chart with separate lines for each segment - makes it easier to compare smaller segments and shows absolute revenue growth trajectories*
 
 ### 5. Quarter-over-Quarter Growth Comparison
-![Q/Q Growth Rate](growth_rate_qoq.png)
+![Q/Q Growth Rate](charts/growth_rate_qoq.png)
 *Grouped bar chart comparing Q/Q growth rates with side-by-side comparison across all segments - shows which segments are accelerating/decelerating*
 
 ### 6. Year-over-Year Growth Comparison
-![Y/Y Growth Rate](growth_rate_yoy.png)
+![Y/Y Growth Rate](charts/growth_rate_yoy.png)
 *Grouped bar chart comparing Y/Y growth rates across fiscal years - reveals seasonal patterns and annual trends*
 
 ### 7. Compound Annual Growth Rate (CAGR)
-![CAGR Chart](cagr_chart.png)
+![CAGR Chart](charts/cagr_chart.png)
 *Line chart showing CAGR evolution over quarters - displays annualized growth rate from baseline to each quarter for all segments*
 
 ### 8. Growth Contribution Analysis
-![Revenue Contribution](revenue_contribution.png)
+![Revenue Contribution](charts/revenue_contribution.png)
 *Shows each segment's contribution to total growth - highlights which segments drive overall revenue increase as percentage of total growth*
 
 ### 9. Indexed Growth Comparison
-![Normalized Growth](normalized_growth.png)
+![Normalized Growth](charts/normalized_growth.png)
 *All segments indexed to 100 at baseline quarter - shows relative growth trajectories for easy comparison regardless of absolute segment size*
 
 ## Development
