@@ -62,10 +62,13 @@ jobs:
           else
             # Get list of new PDFs for commit message
             new_files=$(git diff --cached --name-only --diff-filter=A | grep '\.pdf$' | xargs -I {} basename {})
-            commit_msg="chore: add new NVIDIA quarterly revenue PDFs
+            commit_msg=$(cat <<EOF
+chore: add new NVIDIA quarterly revenue PDFs
 
 Downloaded PDFs:
-$(echo "$new_files" | sed 's/^/- /')"
+$(echo "$new_files" | sed 's/^/- /')
+EOF
+)
 
             git commit -m "$commit_msg"
             git push
