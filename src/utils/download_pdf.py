@@ -108,7 +108,9 @@ def generate_url_patterns(year: int, quarter: int) -> list[str]:
 
     # Pattern 1: Current standard format (FY25 Q2-Q4, FY26 Q2)
     # Example: 2026/Q226/Rev_by_Mkt_Qtrly_Trend_Q226.pdf
-    pattern1 = f"{base_url}/{year}/{quarter_str}/Rev_by_Mkt_Qtrly_Trend_{quarter_str}.pdf"
+    pattern1 = (
+        f"{base_url}/{year}/{quarter_str}/Rev_by_Mkt_Qtrly_Trend_{quarter_str}.pdf"
+    )
 
     # Pattern 2: Alternative filename format (FY26 Q1)
     # Example: 2026/Q126/Q126-NVDA-Quarterly-Revenue-Trend.pdf
