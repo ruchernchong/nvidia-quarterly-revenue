@@ -23,16 +23,6 @@ auto = data["auto"]
 oem_other = data["oem_other"]
 total = data["total"]
 
-# Filter to show only the last 4 quarters for better readability
-max_quarters = 4
-quarters = quarters[-max_quarters:]
-data_center = data_center[-max_quarters:]
-gaming = gaming[-max_quarters:]
-professional_visualization = professional_visualization[-max_quarters:]
-auto = auto[-max_quarters:]
-oem_other = oem_other[-max_quarters:]
-total = total[-max_quarters:]
-
 # Step 3: Calculate growth rates as percentages with + or -
 growth_rates = [
     calculate_growth_rate(total[i], total[i - 1]) if i != 0 else 0
