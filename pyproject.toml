@@ -22,6 +22,11 @@ dev = [
 [tool.uv]
 dev-dependencies = []
 
+[tool.pytest.ini_options]
+python_files = ["*.py"]
+python_functions = ["test_*"]
+testpaths = ["tests"]
+
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 branch = "main"
