@@ -30,7 +30,7 @@ jobs:
             pdf_files=$(git ls-files '*.pdf')
           else
             # For subsequent commits, list changed PDFs
-            pdf_files=$(git diff --name-only HEAD^ HEAD | grep '.pdf$')
+            pdf_files=$(git diff --name-only HEAD^ HEAD | grep '.pdf$' || true)
           fi
 
           if [ -z "$pdf_files" ]; then
