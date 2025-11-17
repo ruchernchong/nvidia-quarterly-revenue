@@ -3,10 +3,11 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+import charts
 import read_pdf
+from charts import format_segment_label
 from utils.calculate_growth_rate import calculate_growth_rate
 from utils.find_latest_pdf import get_latest_pdf
-from utils.replace_text import replace_text
 
 # Step 1: Extract data from the PDF
 # Use provided PDF file or automatically find the latest one
@@ -54,10 +55,12 @@ fig, ax = plt.subplots(figsize=(fig_width, 8))
 # Create stacked bars
 bottom = np.zeros(len(quarters))
 bars = []
-for label, data in zip(segment_labels, segment_data):
-    bar = ax.bar(x, data, width, label=replace_text(label), bottom=bottom)
+for label, segment_values in zip(segment_labels, segment_data):
+    bar = ax.bar(
+        x, segment_values, width, label=format_segment_label(label), bottom=bottom
+    )
     bars.append(bar)
-    bottom += data
+    bottom += segment_values
 
 # Step 6: Add total revenue and data center revenue as line overlays
 ax2 = ax.twinx()  # Create second y-axis
@@ -69,7 +72,7 @@ line_total = ax2.plot(
     linewidth=3,
     markersize=8,
     label="Total Revenue",
-    zorder=5
+    zorder=5,
 )
 
 # Calculate data center growth rates
@@ -87,7 +90,7 @@ line_dc = ax2.plot(
     linewidth=2.5,
     markersize=7,
     label="Data Center Revenue",
-    zorder=4
+    zorder=4,
 )
 
 # Make both y-axes have the same scale
@@ -104,7 +107,9 @@ for i, rate in enumerate(growth_rates):
         ha="center",
         fontsize=10,
         fontweight="bold",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="gray", alpha=0.8)
+        bbox=dict(
+            boxstyle="round,pad=0.3", facecolor="white", edgecolor="gray", alpha=0.8
+        ),
     )
 
 # Add growth rate annotations on the data center line
@@ -118,13 +123,19 @@ for i, rate in enumerate(data_center_growth_rates):
         fontsize=9,
         fontweight="bold",
         color="#76B900",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#76B900", alpha=0.8)
+        bbox=dict(
+            boxstyle="round,pad=0.3", facecolor="white", edgecolor="#76B900", alpha=0.8
+        ),
     )
 
 # Step 8: Add labels, title, and styling
 ax.set_xlabel("Quarter", fontsize=12)
 ax.set_ylabel("Revenue by Segment ($ in millions)", fontsize=12)
-ax.set_title("NVIDIA Quarterly Revenue: Segment Breakdown & Total Trend", fontsize=14, fontweight="bold")
+ax.set_title(
+    "NVIDIA Quarterly Revenue: Segment Breakdown & Total Trend",
+    fontsize=14,
+    fontweight="bold",
+)
 ax.set_xticks(x)
 ax.set_xticklabels(quarters, rotation=0, ha="center", fontsize=11)
 
@@ -150,3 +161,15 @@ ax.grid(axis="y", alpha=0.3, linestyle="--", linewidth=0.5)
 fig.tight_layout()
 plt.savefig("nvidia-revenue-trend.png", dpi=300, bbox_inches="tight")
 plt.show()
+
+# Step 10: Generate additional charts
+print("\nGenerating additional analysis charts...")
+charts.generate_market_share_chart(data)
+charts.generate_stacked_area_chart(data)
+charts.generate_segment_trend_lines(data)
+charts.generate_growth_rate_comparison(data)
+charts.generate_yoy_growth_chart(data)
+charts.generate_cagr_chart(data)
+charts.generate_revenue_contribution(data)
+charts.generate_normalized_growth(data)
+print("\nAll charts generated successfully!")

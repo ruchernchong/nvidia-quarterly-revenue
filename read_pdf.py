@@ -15,13 +15,17 @@ def extract_data_from_pdf(pdf_path):
             if table:
                 # Extract quarters from the first row, skipping the first column header
                 quarters = table[0][1:]
-                data['quarters'] = quarters[::-1]
+                data["quarters"] = quarters[::-1]
 
                 # Process the rest of the rows, skipping the first row (headers)
                 for row in table[1:]:
                     if row:  # Ensure the row is not empty
                         key = replace_text(row[0].lower())
-                        values = [int(item.replace('$', '').replace(',', '')) for item in row[1:] if item]
+                        values = [
+                            int(item.replace("$", "").replace(",", ""))
+                            for item in row[1:]
+                            if item
+                        ]
                         data[key] = values[::-1]
             else:
                 raise ValueError("No table found on the first page.")

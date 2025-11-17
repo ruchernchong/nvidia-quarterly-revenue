@@ -182,7 +182,9 @@ def download_latest_pdfs(
     current_year, current_quarter = get_current_quarter()
 
     print(f"Current fiscal quarter: Q{current_quarter} FY{current_year}")
-    print(f"Checking {check_previous} previous + current + {check_future} future quarters\n")
+    print(
+        f"Checking {check_previous} previous + current + {check_future} future quarters\n"
+    )
 
     # Start from N quarters ago
     year, quarter = current_year, current_quarter

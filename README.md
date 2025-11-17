@@ -7,15 +7,15 @@ A Python tool that extracts and visualises NVIDIA's quarterly revenue data from 
 ## Features
 
 - **Automated PDF Processing**: Automatically detects and processes the latest quarterly PDF from the `data/` directory
-- **Stacked Bar Chart**: Visualises revenue breakdown across five market segments:
+- **Comprehensive Chart Suite**: Generates 9 different visualisations for in-depth revenue analysis
+- **Market Segment Breakdown**: Analyses revenue across five market segments:
   - Data Centre
   - Gaming
   - Professional Visualisation
   - Automotive
   - OEM & Other
-- **Growth Rate Tracking**: Displays quarter-over-quarter growth percentages for total and data centre revenue
-- **Dual Revenue Lines**: Overlays total revenue and data centre revenue trend lines on the chart
-- **Dynamic Scaling**: Chart width adjusts based on the number of quarters displayed (currently showing all 8 quarters from the PDF)
+- **Growth Rate Analysis**: Multiple views of Q/Q, Y/Y, and CAGR growth metrics
+- **Dynamic Scaling**: Chart widths adjust based on the number of quarters displayed (currently showing all 8 quarters from the PDF)
 
 ## Installation
 
@@ -49,11 +49,45 @@ The script automatically detects the latest file by parsing the quarter and year
 
 The script generates:
 - **Console Output**: Quarter-over-quarter growth rates for total revenue
-- **Chart Image**: `nvidia-revenue-trend.png` containing:
-  - Stacked bar chart showing revenue by market segment
-  - Total revenue trend line with growth rate annotations
-  - Data centre revenue trend line with growth rate annotations
-  - Dynamic width based on number of quarters (3 inches per quarter, minimum 12 inches)
+- **9 Chart Images**: Comprehensive visualisation suite
+
+#### Generated Charts
+
+### 1. Main Revenue Trend (Stacked Bar Chart)
+![NVIDIA Revenue Trend](nvidia-revenue-trend.png)
+*Stacked bars showing revenue by market segment with total revenue and data centre revenue trend lines with growth rate annotations*
+
+### 2. Market Share Analysis
+![Market Share Chart](market_share_chart.png)
+*Multi-panel pie/donut charts showing percentage breakdown by segment for each quarter - highlights Data Centre's growing dominance*
+
+### 3. Market Share Evolution
+![Stacked Area Chart](stacked_area_chart.png)
+*100% stacked area chart visualising relative proportion changes over time and segment market share shifts*
+
+### 4. Individual Segment Trends
+![Segment Trends](segment_trends.png)
+*Line chart with separate lines for each segment - makes it easier to compare smaller segments and shows absolute revenue growth trajectories*
+
+### 5. Quarter-over-Quarter Growth Comparison
+![Q/Q Growth Rate](growth_rate_qoq.png)
+*Grouped bar chart comparing Q/Q growth rates with side-by-side comparison across all segments - shows which segments are accelerating/decelerating*
+
+### 6. Year-over-Year Growth Comparison
+![Y/Y Growth Rate](growth_rate_yoy.png)
+*Grouped bar chart comparing Y/Y growth rates across fiscal years - reveals seasonal patterns and annual trends*
+
+### 7. Compound Annual Growth Rate (CAGR)
+![CAGR Chart](cagr_chart.png)
+*Line chart showing CAGR evolution over quarters - displays annualized growth rate from baseline to each quarter for all segments*
+
+### 8. Growth Contribution Analysis
+![Revenue Contribution](revenue_contribution.png)
+*Shows each segment's contribution to total growth - highlights which segments drive overall revenue increase as percentage of total growth*
+
+### 9. Indexed Growth Comparison
+![Normalized Growth](normalized_growth.png)
+*All segments indexed to 100 at baseline quarter - shows relative growth trajectories for easy comparison regardless of absolute segment size*
 
 ## Development
 
@@ -93,14 +127,15 @@ uv run pre-commit install
 nvidia-quarterly-revenue/
 ├── data/                   # PDF files directory
 ├── main.py                 # Main script for data extraction and visualisation
-├── read_pdf.py            # PDF parsing logic
+├── charts.py               # Modular chart generation functions
+├── read_pdf.py             # PDF parsing logic
 ├── utils/
 │   ├── calculate_growth_rate.py  # Growth rate calculation
 │   ├── find_latest_pdf.py        # Latest PDF detection
 │   ├── replace_text.py           # Text formatting utilities
 │   └── download_pdf.py           # PDF download automation
-├── tests/                 # Test suite
-└── nvidia-revenue-trend.png  # Generated chart output
+├── tests/                  # Test suite
+└── *.png                   # Generated chart outputs (9 files)
 ```
 
 ## Automated Workflows
