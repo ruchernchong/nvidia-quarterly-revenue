@@ -81,11 +81,12 @@ data_center_growth_rates = [
     for i in range(len(data_center))
 ]
 
-# Add data center revenue line
+# Add data center revenue line (positioned at midpoint of data center segment)
+data_center_midpoint = [val / 2 for val in data_center]
 line_dc = ax2.plot(
     x,
-    data_center,
-    color="#76B900",
+    data_center_midpoint,
+    color="#FFD700",
     marker="s",
     linewidth=2.5,
     markersize=7,
@@ -116,15 +117,15 @@ for i, rate in enumerate(growth_rates):
 for i, rate in enumerate(data_center_growth_rates):
     ax2.annotate(
         f"{rate}%",
-        (x[i], data_center[i]),
+        (x[i], data_center_midpoint[i]),
         textcoords="offset points",
         xytext=(0, -25),
         ha="center",
         fontsize=9,
         fontweight="bold",
-        color="#76B900",
+        color="#FFD700",
         bbox=dict(
-            boxstyle="round,pad=0.3", facecolor="white", edgecolor="#76B900", alpha=0.8
+            boxstyle="round,pad=0.3", facecolor="black", edgecolor="#FFD700", alpha=0.8
         ),
     )
 
