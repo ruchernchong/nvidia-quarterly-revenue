@@ -1,6 +1,6 @@
 [project]
 name = "nvidia-quarterly-revenue"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = [{ name = "Ru Chern Chong", email = "hello@ruchern.dev" }]
 requires-python = "~=3.12"

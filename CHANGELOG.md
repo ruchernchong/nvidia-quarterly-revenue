@@ -1,7 +1,15 @@
 # CHANGELOG
 
 
+## v0.2.1 (2025-11-17)
+
+
 ## v0.2.0 (2025-11-17)
+
+### Bug Fixes
+
+- Resolve YAML syntax error in workflow
+  ([`807a187`](https://github.com/ruchernchong/nvidia-quarterly-revenue/commit/807a187b8d5e6109749fa1d7503892bc2d7a57f7))
 
 ### Features
 
