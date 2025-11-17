@@ -1,0 +1,88 @@
+name: PDF Downloader Workflow
+
+on:
+  schedule:
+    # Run every Monday at 9:00 AM UTC (after NVIDIA typically releases quarterly earnings)
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      check_previous:
+        description: 'Number of previous quarters to check'
+        required: false
+        default: '1'
+      check_future:
+        description: 'Number of future quarters to check'
+        required: false
+        default: '2'
+
+jobs:
+  download-pdfs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: latest
+
+      - name: Download New PDFs
+        id: download
+        run: |
+          echo "Running PDF downloader..."
+          uv run python -m utils.download_pdf data > download_output.txt 2>&1
+          cat download_output.txt
+
+          # Check if any new files were downloaded
+          if git status --porcelain | grep -q '\.pdf$'; then
+            echo "new_pdfs=true" >> $GITHUB_OUTPUT
+            echo "New PDFs downloaded!"
+          else
+            echo "new_pdfs=false" >> $GITHUB_OUTPUT
+            echo "No new PDFs found."
+          fi
+
+      - name: Process New PDFs
+        if: steps.download.outputs.new_pdfs == 'true'
+        run: |
+          # Run the analysis on the latest PDF
+          latest_pdf=$(uv run python -c "from utils.find_latest_pdf import get_latest_pdf; print(get_latest_pdf())")
+          echo "Processing latest PDF: $latest_pdf"
+          uv run python main.py "$latest_pdf"
+
+      - name: Commit and Push Changes
+        if: steps.download.outputs.new_pdfs == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/*.pdf nvidia-revenue-trend.png
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            # Get list of new PDFs for commit message
+            new_files=$(git diff --cached --name-only --diff-filter=A | grep '\.pdf$' | xargs -I {} basename {})
+            commit_msg="chore: add new NVIDIA quarterly revenue PDFs
+
+Downloaded PDFs:
+$(echo "$new_files" | sed 's/^/- /')"
+
+            git commit -m "$commit_msg"
+            git push
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## PDF Downloader Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.download.outputs.new_pdfs }}" == "true" ]; then
+            echo "✅ New PDFs were downloaded and processed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ No new PDFs found" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Download Log" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat download_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
