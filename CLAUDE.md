@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 - Install dependencies: `uv sync`
 - Install with dev dependencies: `uv sync --all-groups`
-- Run the application: `uv run python -m src.main` (auto-detects latest PDF) or `uv run python -m src.main <PDF File>`
+- Run the application: `uv run main.py` (auto-detects latest PDF) or `uv run main.py <PDF File>`
 - Run all tests: `uv run pytest`
 - Run a specific test: `uv run pytest tests/test_replace_text.py::test_replace_spaces`
 - Format code: `uv run black .`
@@ -13,8 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Structure
 ```
-├── src/                    # Source code
-│   ├── main.py            # Main entry point
+├── main.py                # Main entry point
+├── src/                   # Source code library
 │   ├── read_pdf.py        # PDF parsing
 │   ├── charts.py          # Chart generation functions
 │   └── utils/             # Utility modules
@@ -28,7 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 This project analyses NVIDIA quarterly revenue PDFs and generates visualisation charts. Key components:
-- **src/main.py**: Main script - extracts data, calculates growth rates, generates stacked bar chart with revenue trend lines
+- **main.py**: Main script - extracts data, calculates growth rates, generates stacked bar chart with revenue trend lines
 - **src/read_pdf.py**: PDF parsing using pdfplumber to extract quarterly revenue data
 - **src/charts.py**: Chart generation functions for all 8 visualisation types
 - **src/utils/find_latest_pdf.py**: Auto-detects latest PDF by parsing quarter/year from filenames (e.g., Q226 = Q2 FY26)
