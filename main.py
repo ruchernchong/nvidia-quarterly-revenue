@@ -69,9 +69,9 @@ for label, data in zip(segment_labels, segment_data):
     bars.append(bar)
     bottom += data
 
-# Step 6: Add total revenue as a line overlay
+# Step 6: Add total revenue and data center revenue as line overlays
 ax2 = ax.twinx()  # Create second y-axis
-line = ax2.plot(
+line_total = ax2.plot(
     x,
     total,
     color="#2E2E2E",
@@ -81,11 +81,30 @@ line = ax2.plot(
     label="Total Revenue",
     zorder=5
 )
+
+# Calculate data center growth rates
+data_center_growth_rates = [
+    calculate_growth_rate(data_center[i], data_center[i - 1]) if i != 0 else 0
+    for i in range(len(data_center))
+]
+
+# Add data center revenue line
+line_dc = ax2.plot(
+    x,
+    data_center,
+    color="#76B900",
+    marker="s",
+    linewidth=2.5,
+    markersize=7,
+    label="Data Center Revenue",
+    zorder=4
+)
+
 # Make both y-axes have the same scale
 ax2.set_ylim(ax.get_ylim())
-ax2.set_ylabel("Total Revenue ($ in millions)", fontsize=12)
+ax2.set_ylabel("Revenue ($ in millions)", fontsize=12)
 
-# Step 7: Add growth rate annotations on the line
+# Step 7: Add growth rate annotations on the total revenue line
 for i, rate in enumerate(growth_rates):
     ax2.annotate(
         f"{rate}%",
@@ -96,6 +115,20 @@ for i, rate in enumerate(growth_rates):
         fontsize=10,
         fontweight="bold",
         bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="gray", alpha=0.8)
+    )
+
+# Add growth rate annotations on the data center line
+for i, rate in enumerate(data_center_growth_rates):
+    ax2.annotate(
+        f"{rate}%",
+        (x[i], data_center[i]),
+        textcoords="offset points",
+        xytext=(0, -25),
+        ha="center",
+        fontsize=9,
+        fontweight="bold",
+        color="#76B900",
+        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#76B900", alpha=0.8)
     )
 
 # Step 8: Add labels, title, and styling
