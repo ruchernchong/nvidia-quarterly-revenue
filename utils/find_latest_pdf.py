@@ -28,6 +28,10 @@ def get_latest_pdf(directory: str = "data") -> str:
     """
     Find the PDF file with the latest quarter/year.
 
+    Supports both NVIDIA filename formats:
+    - Standard: Rev_by_Mkt_Qtrly_Trend_Q*.pdf
+    - Alternative: Q*-NVDA-Quarterly-Revenue-Trend.pdf
+
     Args:
         directory: Directory to search for PDF files (default: data)
 
@@ -37,7 +41,11 @@ def get_latest_pdf(directory: str = "data") -> str:
     Raises:
         FileNotFoundError: If no PDF files are found
     """
-    pdf_files = list(Path(directory).glob("Rev_by_Mkt_Qtrly_Trend_Q*.pdf"))
+    # Search for both naming patterns
+    pdf_dir = Path(directory)
+    pdf_files = list(pdf_dir.glob("Rev_by_Mkt_Qtrly_Trend_Q*.pdf"))
+    pdf_files.extend(pdf_dir.glob("Q*-NVDA-Quarterly-Revenue-Trend.pdf"))
+
     if not pdf_files:
         raise FileNotFoundError(
             "No NVIDIA quarterly revenue PDF files found in the directory"
