@@ -3,12 +3,13 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Commands
-- Install dependencies: `uv pip install -e .` or `uv pip install -e ".[dev]"` for dev dependencies
-- Run the application: `python main.py <PDF File>`
-- Run all tests: `pytest`
-- Run a specific test: `pytest tests/test_replace_text.py::test_replace_spaces`
-- Format code: `black .`
-- Pre-commit hooks: `pre-commit run --all-files`
+- Install dependencies: `uv sync`
+- Install with dev dependencies: `uv sync --all-groups`
+- Run the application: `uv run python main.py <PDF File>`
+- Run all tests: `uv run pytest`
+- Run a specific test: `uv run pytest tests/test_replace_text.py::test_replace_spaces`
+- Format code: `uv run black .`
+- Pre-commit hooks: `uv run pre-commit run --all-files`
 
 ## Code Style Guidelines
 - **Formatting**: Use Black for code formatting
