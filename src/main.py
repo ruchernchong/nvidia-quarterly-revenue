@@ -3,11 +3,10 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-import charts
-import read_pdf
-from charts import format_segment_label
-from utils.calculate_growth_rate import calculate_growth_rate
-from utils.find_latest_pdf import get_latest_pdf
+from src import charts, read_pdf
+from src.charts import format_segment_label
+from src.utils.calculate_growth_rate import calculate_growth_rate
+from src.utils.find_latest_pdf import get_latest_pdf
 
 # Step 1: Extract data from the PDF
 # Use provided PDF file or automatically find the latest one
@@ -160,7 +159,7 @@ ax.grid(axis="y", alpha=0.3, linestyle="--", linewidth=0.5)
 
 # Step 9: Adjust layout and save the figure
 fig.tight_layout()
-plt.savefig("nvidia-revenue-trend.png", dpi=300, bbox_inches="tight")
+plt.savefig("charts/nvidia-revenue-trend.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 # Step 10: Generate additional charts

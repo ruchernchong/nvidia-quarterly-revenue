@@ -1,7 +1,7 @@
 """Tests for find_latest_pdf utility functions."""
 
 import pytest
-from utils.find_latest_pdf import parse_quarter_year
+from src.utils.find_latest_pdf import parse_quarter_year
 
 
 def test_parse_quarter_year_q226():

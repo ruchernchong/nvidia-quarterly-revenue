@@ -1,4 +1,4 @@
-from utils.replace_text import (
+from src.utils.replace_text import (
     replace_text,
     contains_single_underscore,
     replace_multiple_underscores,

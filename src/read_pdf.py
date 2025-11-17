@@ -1,6 +1,6 @@
 import pdfplumber
 
-from utils.replace_text import replace_text
+from src.utils.replace_text import replace_text
 
 
 def extract_data_from_pdf(pdf_path):

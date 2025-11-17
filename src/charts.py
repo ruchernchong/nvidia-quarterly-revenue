@@ -61,7 +61,7 @@ def get_segment_colours() -> Dict[str, str]:
 
 
 def generate_market_share_chart(
-    data: Dict[str, List], output_file: str = "market_share_chart.png"
+    data: Dict[str, List], output_file: str = "charts/market_share_chart.png"
 ) -> None:
     """
     Generate multi-panel pie/donut charts showing market share by segment for each quarter.
@@ -127,7 +127,7 @@ def generate_market_share_chart(
 
 
 def generate_stacked_area_chart(
-    data: Dict[str, List], output_file: str = "stacked_area_chart.png"
+    data: Dict[str, List], output_file: str = "charts/stacked_area_chart.png"
 ) -> None:
     """
     Generate 100% stacked area chart showing relative market share over time.
@@ -190,7 +190,7 @@ def generate_stacked_area_chart(
 
 
 def generate_segment_trend_lines(
-    data: Dict[str, List], output_file: str = "segment_trends.png"
+    data: Dict[str, List], output_file: str = "charts/segment_trends.png"
 ) -> None:
     """
     Generate line chart showing individual segment revenue trends over time.
@@ -244,7 +244,7 @@ def generate_segment_trend_lines(
 
 
 def generate_growth_rate_comparison(
-    data: Dict[str, List], output_file: str = "growth_rate_qoq.png"
+    data: Dict[str, List], output_file: str = "charts/growth_rate_qoq.png"
 ) -> None:
     """
     Generate bar chart comparing quarter-over-quarter growth rates across segments.
@@ -318,7 +318,7 @@ def generate_growth_rate_comparison(
 
 
 def generate_yoy_growth_chart(
-    data: Dict[str, List], output_file: str = "growth_rate_yoy.png"
+    data: Dict[str, List], output_file: str = "charts/growth_rate_yoy.png"
 ) -> None:
     """
     Generate bar chart comparing year-over-year growth rates across segments.
@@ -403,7 +403,7 @@ def generate_yoy_growth_chart(
 
 
 def generate_cagr_chart(
-    data: Dict[str, List], output_file: str = "cagr_chart.png"
+    data: Dict[str, List], output_file: str = "charts/cagr_chart.png"
 ) -> None:
     """
     Generate line chart showing Compound Annual Growth Rate (CAGR) over quarters.
@@ -484,7 +484,7 @@ def generate_cagr_chart(
 
 
 def generate_revenue_contribution(
-    data: Dict[str, List], output_file: str = "revenue_contribution.png"
+    data: Dict[str, List], output_file: str = "charts/revenue_contribution.png"
 ) -> None:
     """
     Generate chart showing each segment's contribution to total revenue growth.
@@ -562,7 +562,7 @@ def generate_revenue_contribution(
 
 
 def generate_normalized_growth(
-    data: Dict[str, List], output_file: str = "normalized_growth.png"
+    data: Dict[str, List], output_file: str = "charts/normalized_growth.png"
 ) -> None:
     """
     Generate chart with all segments indexed to 100 at baseline quarter.
