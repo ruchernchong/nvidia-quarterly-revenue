@@ -1,4 +1,6 @@
 name: PDF Monitor Workflow
+permissions:
+  contents: write
 
 on:
   push:
