@@ -31,7 +31,7 @@ jobs:
         id: download
         run: |
           echo "Running PDF downloader..."
-          uv run python -m utils.download_pdf data > download_output.txt 2>&1
+          uv run python -m src.utils.download_pdf data > download_output.txt 2>&1
           cat download_output.txt
 
           # Check if any new files were downloaded
@@ -47,7 +47,7 @@ jobs:
         if: steps.download.outputs.new_pdfs == 'true'
         run: |
           # Run the analysis on the latest PDF
-          latest_pdf=$(uv run python -c "from utils.find_latest_pdf import get_latest_pdf; print(get_latest_pdf())")
+          latest_pdf=$(uv run python -c "from src.utils.find_latest_pdf import get_latest_pdf; print(get_latest_pdf())")
           echo "Processing latest PDF: $latest_pdf"
           uv run python main.py "$latest_pdf"
 
@@ -56,7 +56,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/*.pdf nvidia-revenue-trend.png
+          git add data/*.pdf charts/*.png
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
