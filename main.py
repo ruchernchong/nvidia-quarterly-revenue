@@ -47,7 +47,9 @@ bar_labels = [
 ]
 bar_data = [data_center, gaming, professional_visualization, auto, oem_other, total]
 
-fig, ax = plt.subplots(figsize=(14, 8))
+# Dynamic figure width: 2.5 inches per quarter, minimum 14 inches
+fig_width = max(14, len(quarters) * 2.5)
+fig, ax = plt.subplots(figsize=(fig_width, 8))
 
 rects = []
 for pos, label, data in zip(bar_positions, bar_labels, bar_data):
@@ -60,20 +62,22 @@ for i, rate in enumerate(growth_rates):
         f"{rate}%",
         (x[i], total[i]),
         textcoords="offset points",
-        xytext=(0, 5),
+        xytext=(0, 8),
         ha="center",
+        fontsize=9,
+        fontweight="bold",
     )
 
 # Step 7: Add some text for labels, title, and custom x-axis tick labels, etc.
-ax.set_xlabel("Quarter")
-ax.set_ylabel("Revenue ($ in millions)")
-ax.set_title("NVIDIA Quarterly Revenue Trend by Market")
+ax.set_xlabel("Quarter", fontsize=12)
+ax.set_ylabel("Revenue ($ in millions)", fontsize=12)
+ax.set_title("NVIDIA Quarterly Revenue Trend by Market", fontsize=14, fontweight="bold")
 ax.set_xticks(x)
-ax.set_xticklabels(quarters)
-ax.legend()
+ax.set_xticklabels(quarters, rotation=45, ha="right", fontsize=10)
+ax.legend(fontsize=10)
 
-# Rotate the tick labels for better readability
-plt.xticks(rotation=45)
+# Adjust tick label size
+ax.tick_params(axis="y", labelsize=10)
 
 # Step 8: Adjust layout and save the figure
 fig.tight_layout()
