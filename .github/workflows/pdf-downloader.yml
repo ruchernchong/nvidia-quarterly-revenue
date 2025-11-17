@@ -1,4 +1,6 @@
 name: PDF Downloader Workflow
+permissions:
+  contents: write
 
 on:
   schedule:
