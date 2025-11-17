@@ -5,11 +5,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 - Install dependencies: `uv sync`
 - Install with dev dependencies: `uv sync --all-groups`
-- Run the application: `uv run python main.py <PDF File>`
+- Run the application: `uv run python main.py` (auto-detects latest PDF) or `uv run python main.py <PDF File>`
 - Run all tests: `uv run pytest`
 - Run a specific test: `uv run pytest tests/test_replace_text.py::test_replace_spaces`
 - Format code: `uv run black .`
 - Pre-commit hooks: `uv run pre-commit run --all-files`
+
+## Project Overview
+This project analyses NVIDIA quarterly revenue PDFs and generates visualisation charts. Key components:
+- **main.py**: Main script - extracts data, calculates growth rates, generates stacked bar chart with revenue trend lines
+- **read_pdf.py**: PDF parsing using pdfplumber to extract quarterly revenue data
+- **utils/find_latest_pdf.py**: Auto-detects latest PDF by parsing quarter/year from filenames (e.g., Q226 = Q2 FY26)
+- **utils/calculate_growth_rate.py**: Calculates quarter-over-quarter growth percentages
+- **utils/replace_text.py**: Formats segment labels for display (e.g., "data_center" → "Data Centre")
+
+## Chart Configuration
+- **Display**: Shows all 8 quarters from the PDF (no filtering)
+- **Format**: Stacked bar chart with dual revenue trend lines (total + data centre)
+- **Width**: Dynamic - 3 inches per quarter, minimum 12 inches
+- **Segments**: Data Centre, Gaming, Professional Visualisation, Automotive, OEM & Other
+- **Annotations**: Growth rates displayed on both total and data centre trend lines
 
 ## Code Style Guidelines
 - **Formatting**: Use Black for code formatting
@@ -19,3 +34,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Error Handling**: Use try/except blocks with specific exception types
 - **Documentation**: Add docstrings for functions with parameters and return types
 - **Pre-commit Hooks**: Ensure trailing whitespace is removed and files end with a newline
+- **Spelling**: Use English (UK/Singapore) spelling (e.g., "visualise", "centre", "colour")
