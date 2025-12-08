@@ -35,6 +35,7 @@ def create_release(tag: str) -> bool:
             "--notes",
             f"Added NVIDIA quarterly revenue data for {tag}",
             "--latest",
+            "--draft=false",
         ],
         capture_output=True,
         text=True,
