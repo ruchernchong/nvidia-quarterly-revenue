@@ -31,7 +31,7 @@ def create_release(tag: str) -> bool:
             "create",
             tag,
             "--title",
-            f"NVIDIA Quarterly Revenue - {tag}",
+            tag,
             "--notes",
             f"Added NVIDIA quarterly revenue data for {tag}",
             "--latest",
