@@ -125,17 +125,22 @@ uv run pre-commit install
 
 ```
 nvidia-quarterly-revenue/
-├── data/                   # PDF files directory
 ├── main.py                 # Main script for data extraction and visualisation
-├── charts.py               # Modular chart generation functions
-├── read_pdf.py             # PDF parsing logic
-├── utils/
-│   ├── calculate_growth_rate.py  # Growth rate calculation
-│   ├── find_latest_pdf.py        # Latest PDF detection
-│   ├── replace_text.py           # Text formatting utilities
-│   └── download_pdf.py           # PDF download automation
-├── tests/                  # Test suite
-└── *.png                   # Generated chart outputs (9 files)
+├── src/                    # Source code library
+│   ├── charts.py           # Modular chart generation functions
+│   ├── read_pdf.py         # PDF parsing logic
+│   ├── database.py         # SQLite database operations
+│   └── utils/
+│       ├── calculate_growth_rate.py  # Growth rate calculation
+│       ├── find_latest_pdf.py        # Latest PDF detection
+│       ├── replace_text.py           # Text formatting utilities
+│       ├── download_pdf.py           # PDF download automation
+│       └── create_release.py         # GitHub release creation
+├── batch/                  # Batch processing scripts
+│   └── import.py           # Batch import & export tool
+├── data/                   # PDF files and database
+├── charts/                 # Generated chart outputs (9 files)
+└── tests/                  # Test suite
 ```
 
 ## Automated Workflows

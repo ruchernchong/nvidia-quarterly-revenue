@@ -16,15 +16,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commit Message Style
 - **Always use the `/commit` slash command** for consistency
-- **Format**: Follow conventional commits (e.g., `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`)
-- **Case**: Use lowercase for the description after the prefix
+- **Format**: Plain descriptive messages (no conventional commit prefixes)
+- **Case**: Capitalise the first letter
 - **Punctuation**: No trailing periods
-- **Length**: Keep messages short and concise
+- **Length**: Keep messages short and concise (max 50 characters)
 
 Examples:
-- `chore: release 0.3.1`
-- `fix: correct chart paths to charts directory`
-- `feat: add new revenue analysis function`
+- `Correct chart paths to charts directory`
+- `Add new revenue analysis function`
 
 ## Project Structure
 ```
@@ -36,7 +35,9 @@ Examples:
 │   └── utils/             # Utility modules
 │       ├── find_latest_pdf.py
 │       ├── calculate_growth_rate.py
-│       └── replace_text.py
+│       ├── replace_text.py
+│       ├── download_pdf.py
+│       └── create_release.py
 ├── batch/                 # Batch processing scripts
 │   └── import.py          # Batch import & export tool
 ├── data/                  # PDF files and database
@@ -56,6 +57,8 @@ This project analyses NVIDIA quarterly revenue PDFs and generates visualisation 
 - **src/utils/find_latest_pdf.py**: Auto-detects latest PDF by parsing quarter/year from filenames (e.g., Q226 = Q2 FY26)
 - **src/utils/calculate_growth_rate.py**: Calculates quarter-over-quarter growth percentages
 - **src/utils/replace_text.py**: Formats segment labels for display (e.g., "data_center" → "Data Centre")
+- **src/utils/download_pdf.py**: Downloads quarterly revenue PDFs from NVIDIA investor relations
+- **src/utils/create_release.py**: Creates GitHub releases for new quarters
 
 ## Database Features
 - **SQLite Storage**: All quarterly revenue data stored in `data/data.db` for fast querying
