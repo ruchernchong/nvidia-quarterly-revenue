@@ -75,6 +75,12 @@ jobs:
             git push
           fi
 
+      - name: Create Release
+        if: steps.download.outputs.new_pdfs == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run python -m src.utils.create_release
+
       - name: Summary
         if: always()
         run: |

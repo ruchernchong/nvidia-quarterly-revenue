@@ -61,3 +61,9 @@ jobs:
             git commit -m "Automated commit of changes made by PDF Monitor Workflow"
             git push
           fi
+
+      - name: Create Release
+        if: env.pdf_files != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run python -m src.utils.create_release
