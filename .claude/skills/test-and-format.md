@@ -1,11 +1,10 @@
 # Test and Format
 
-Run the complete test and code quality suite for this project.
+Run the Rust test and code-quality suite before completing changes.
 
-This skill will:
-1. Run all tests using pytest
-2. Run Black code formatter
-3. Run pre-commit hooks on all files
-4. Report any failures or issues that need attention
-
-This ensures code quality and adherence to project standards before committing.
+1. Format with `cargo fmt --all`.
+2. Check formatting with `cargo fmt --all -- --check`.
+3. Check lints with `cargo clippy --locked --all-targets -- -D warnings`.
+4. Run all tests with `cargo test --locked`. PDF and chart integration checks require Poppler and system fonts.
+5. If the optional pre-commit tool is installed, run `pre-commit run --all-files`.
+6. Report any failures and fix issues within the requested scope.

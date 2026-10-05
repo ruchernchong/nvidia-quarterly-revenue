@@ -8,62 +8,79 @@ on:
       - '**/*.pdf'
   workflow_dispatch:
 
+concurrency:
+  group: revenue-updater-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   pdf-updater:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v5
         with:
-          version: latest
+          fetch-depth: 0
 
       - name: Find Changed PDF Files
+        id: changed
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [ $(git rev-parse --is-shallow-repository) = true ]; then
-            # For shallow clones, fetch the full history
-            git fetch --unshallow
-          fi
-
-          if [ $(git rev-list --count HEAD) -eq 1 ]; then
-            # If only one commit exists, list all PDFs
-            pdf_files=$(git ls-files '*.pdf')
+          if [ "$EVENT_NAME" = "push" ] && [ -n "$BEFORE_SHA" ] \
+            && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ] \
+            && git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+            git diff --name-only -z --diff-filter=ACMR "$BEFORE_SHA" HEAD -- '*.pdf' \
+              > "$RUNNER_TEMP/changed_pdfs.txt"
           else
-            # For subsequent commits, list changed PDFs
-            pdf_files=$(git diff --name-only HEAD^ HEAD | grep '.pdf$' || true)
+            git ls-files -z -- '*.pdf' > "$RUNNER_TEMP/changed_pdfs.txt"
+          fi
+          if [ -s "$RUNNER_TEMP/changed_pdfs.txt" ]; then
+            echo "has_pdfs=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_pdfs=false" >> "$GITHUB_OUTPUT"
+            echo "No changed PDF files found."
           fi
 
-          if [ -z "$pdf_files" ]; then
-            echo "No changed PDF files found. Exiting workflow."
-            exit 0
-          fi
-
-          echo "pdf_files=$pdf_files" >> $GITHUB_ENV
-
-      - name: Run Python Script
-        if: env.pdf_files != ''
+      - name: Build Rust CLI
+        if: steps.changed.outputs.has_pdfs == 'true'
         run: |
-          for pdf_file in ${{ env.pdf_files }}; do
-            uv run main.py "$pdf_file"
-          done
+          rustup toolchain install stable --profile minimal
+          rustup override set stable
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils libfontconfig1-dev pkg-config fonts-dejavu-core
+          cargo build --release --locked
+
+      - name: Process PDFs and Update Revenue Exports
+        if: steps.changed.outputs.has_pdfs == 'true'
+        run: |
+          while IFS= read -r -d '' pdf_file; do
+            target/release/nvidia-revenue analyse "$pdf_file" --output-dir charts
+          done < "$RUNNER_TEMP/changed_pdfs.txt"
+          target/release/nvidia-revenue batch --import --data-dir data --db data/data.db \
+            --csv data/revenue_export.csv --json data/revenue_export.json
+          # Charts always show the latest quarter, even when older PDFs change.
+          target/release/nvidia-revenue analyse --data-dir data --output-dir charts
 
       - name: Commit and Push Changes
-        if: env.pdf_files != ''
+        if: steps.changed.outputs.has_pdfs == 'true'
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -- data/data.db data/revenue_export.csv data/revenue_export.json 'charts/*.png'
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Automated commit of changes made by PDF Monitor Workflow"
+            git commit -m "Update revenue data and charts from PDFs"
             git push
           fi
 
       - name: Create Release
-        if: env.pdf_files != ''
+        if: steps.changed.outputs.has_pdfs == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m src.utils.create_release
+        run: target/release/nvidia-revenue release --data-dir data

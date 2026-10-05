@@ -1,9 +1,13 @@
 name: Test
 
-on: [push]
+on: [push, pull_request]
 
 permissions:
   contents: read
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   test:
@@ -11,11 +15,18 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v5
-        with:
-          version: latest
-
-      - name: Test with pytest
+      - name: Install Rust and Native Dependencies
         run: |
-          uv run --frozen pytest
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+          rustup override set stable
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils libfontconfig1-dev pkg-config fonts-dejavu-core
+
+      - name: Check Formatting
+        run: cargo fmt --all -- --check
+
+      - name: Check Lints
+        run: cargo clippy --locked --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --locked

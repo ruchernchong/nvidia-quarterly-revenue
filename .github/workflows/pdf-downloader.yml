@@ -4,7 +4,7 @@ permissions:
 
 on:
   schedule:
-    # Run every Monday at 9:00 AM UTC (after NVIDIA typically releases quarterly earnings)
+    # Run every Monday at 9:00 AM UTC.
     - cron: '0 9 * * 1'
   workflow_dispatch:
     inputs:
@@ -17,6 +17,14 @@ on:
         required: false
         default: '2'
 
+concurrency:
+  group: revenue-updater-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   download-pdfs:
     runs-on: ubuntu-latest
@@ -24,54 +32,60 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v5
-        with:
-          version: latest
+      - name: Build Rust CLI
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup override set stable
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils curl libfontconfig1-dev pkg-config fonts-dejavu-core
+          cargo build --release --locked
 
       - name: Download New PDFs
         id: download
+        env:
+          CHECK_PREVIOUS: ${{ inputs.check_previous || '1' }}
+          CHECK_FUTURE: ${{ inputs.check_future || '2' }}
         run: |
-          echo "Running PDF downloader..."
-          uv run python -m src.utils.download_pdf data > download_output.txt 2>&1
-          cat download_output.txt
+          target/release/nvidia-revenue download --data-dir data \
+            --check-previous "$CHECK_PREVIOUS" --check-future "$CHECK_FUTURE" \
+            2>&1 | tee "$RUNNER_TEMP/download_output.txt"
 
-          # Check if any new files were downloaded
-          if git status --porcelain | grep -q '\.pdf$'; then
-            echo "new_pdfs=true" >> $GITHUB_OUTPUT
-            echo "New PDFs downloaded!"
+          # Keep paths NUL-delimited so multiple files and spaces are safe.
+          {
+            git diff --name-only -z --diff-filter=ACMR -- 'data/*.pdf'
+            git ls-files --others --exclude-standard -z -- 'data/*.pdf'
+          } > "$RUNNER_TEMP/new_pdfs.txt"
+          if [ -s "$RUNNER_TEMP/new_pdfs.txt" ]; then
+            echo "new_pdfs=true" >> "$GITHUB_OUTPUT"
           else
-            echo "new_pdfs=false" >> $GITHUB_OUTPUT
-            echo "No new PDFs found."
+            echo "new_pdfs=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Process New PDFs
+      - name: Import Revenue and Generate Charts
         if: steps.download.outputs.new_pdfs == 'true'
         run: |
-          # Run the analysis on the latest PDF
-          latest_pdf=$(uv run python -c "from src.utils.find_latest_pdf import get_latest_pdf; print(get_latest_pdf())")
-          echo "Processing latest PDF: $latest_pdf"
-          uv run python main.py "$latest_pdf"
+          target/release/nvidia-revenue batch --import --data-dir data --db data/data.db \
+            --csv data/revenue_export.csv --json data/revenue_export.json
+          target/release/nvidia-revenue analyse --data-dir data --output-dir charts
 
       - name: Commit and Push Changes
         if: steps.download.outputs.new_pdfs == 'true'
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/*.pdf charts/*.png
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -- 'data/*.pdf' data/data.db data/revenue_export.csv data/revenue_export.json 'charts/*.png'
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            # Get list of new PDFs for commit message
-            new_files=$(git diff --cached --name-only --diff-filter=A | grep '\.pdf$' | xargs -I {} basename {})
-
-            # Build commit message
-            echo "chore: add new NVIDIA quarterly revenue PDFs" > /tmp/commit_msg.txt
-            echo "" >> /tmp/commit_msg.txt
-            echo "Downloaded PDFs:" >> /tmp/commit_msg.txt
-            echo "$new_files" | sed 's/^/- /' >> /tmp/commit_msg.txt
-
-            git commit -F /tmp/commit_msg.txt
+            {
+              echo "Add new NVIDIA quarterly revenue PDFs"
+              echo
+              echo "Downloaded PDFs:"
+              while IFS= read -r -d '' pdf_file; do
+                printf -- '- %s\n' "${pdf_file##*/}"
+              done < "$RUNNER_TEMP/new_pdfs.txt"
+            } > "$RUNNER_TEMP/commit_msg.txt"
+            git commit -F "$RUNNER_TEMP/commit_msg.txt"
             git push
           fi
 
@@ -79,20 +93,29 @@ jobs:
         if: steps.download.outputs.new_pdfs == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m src.utils.create_release
+        run: target/release/nvidia-revenue release --data-dir data
 
       - name: Summary
         if: always()
+        env:
+          NEW_PDFS: ${{ steps.download.outputs.new_pdfs }}
+          JOB_STATUS: ${{ job.status }}
         run: |
-          echo "## PDF Downloader Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.download.outputs.new_pdfs }}" == "true" ]; then
-            echo "✅ New PDFs were downloaded and processed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "ℹ️ No new PDFs found" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Download Log" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat download_output.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## PDF Downloader Summary"
+            echo
+            if [ "$JOB_STATUS" != "success" ]; then
+              echo "PDF downloader did not complete successfully ($JOB_STATUS)."
+            elif [ "$NEW_PDFS" = "true" ]; then
+              echo "New PDFs were downloaded, imported and processed."
+            else
+              echo "No new PDFs found."
+            fi
+            if [ -f "$RUNNER_TEMP/download_output.txt" ]; then
+              echo
+              echo "### Download Log"
+              echo '```'
+              cat "$RUNNER_TEMP/download_output.txt"
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
