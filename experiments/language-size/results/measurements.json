@@ -1,0 +1,131 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "versions": {
+    "go": "go version go1.27.1 darwin/arm64",
+    "rust": "rustc 1.98.1 (48a229cea 2026-09-01) (Homebrew)",
+    "julia": "julia version 1.13.1"
+  },
+  "sizes": {
+    "go": {
+      "source_project_bytes": 5306,
+      "executable_bytes": 1972418,
+      "runtime_tree_bytes": 0,
+      "csv_deployment_bytes": 1972418,
+      "pdf_deployment_bytes": 18034234,
+      "build_cache_or_target_bytes": 41561225
+    },
+    "rust": {
+      "source_project_bytes": 6906,
+      "executable_bytes": 354384,
+      "runtime_tree_bytes": 0,
+      "csv_deployment_bytes": 354384,
+      "pdf_deployment_bytes": 16416200,
+      "build_cache_or_target_bytes": 711963
+    },
+    "julia": {
+      "source_project_bytes": 4307,
+      "executable_bytes": 68032,
+      "runtime_tree_bytes": 803456386,
+      "csv_deployment_bytes": 803460693,
+      "pdf_deployment_bytes": 819522509,
+      "build_cache_or_target_bytes": 281557
+    }
+  },
+  "shared_pdf_converter": {
+    "bytes": 16061816,
+    "files": [
+      "/opt/homebrew/Cellar/fontconfig/2.18.3/lib/libfontconfig.1.dylib",
+      "/opt/homebrew/Cellar/freetype/2.14.3/lib/libfreetype.6.dylib",
+      "/opt/homebrew/Cellar/gettext/1.0/lib/libintl.8.dylib",
+      "/opt/homebrew/Cellar/glib/2.88.3/lib/libglib-2.0.0.dylib",
+      "/opt/homebrew/Cellar/gpgme/2.2.0/lib/libgpgme.45.dylib",
+      "/opt/homebrew/Cellar/gpgmepp/2.2.0/lib/libgpgmepp.7.2.0.dylib",
+      "/opt/homebrew/Cellar/graphite2/1.3.15/lib/libgraphite2.3.3.1.dylib",
+      "/opt/homebrew/Cellar/harfbuzz/14.4.0/lib/libharfbuzz-subset.0.dylib",
+      "/opt/homebrew/Cellar/harfbuzz/14.4.0/lib/libharfbuzz.0.dylib",
+      "/opt/homebrew/Cellar/jpeg-turbo/3.2.0/lib/libjpeg.8.3.2.dylib",
+      "/opt/homebrew/Cellar/libassuan/3.0.2/lib/libassuan.9.dylib",
+      "/opt/homebrew/Cellar/libgpg-error/1.61/lib/libgpg-error.0.dylib",
+      "/opt/homebrew/Cellar/libpng/1.6.58/lib/libpng16.16.dylib",
+      "/opt/homebrew/Cellar/libtiff/4.7.2/lib/libtiff.6.dylib",
+      "/opt/homebrew/Cellar/little-cms2/2.19.1/lib/liblcms2.2.dylib",
+      "/opt/homebrew/Cellar/nspr/4.40/lib/libnspr4.dylib",
+      "/opt/homebrew/Cellar/nspr/4.40/lib/libplc4.dylib",
+      "/opt/homebrew/Cellar/nspr/4.40/lib/libplds4.dylib",
+      "/opt/homebrew/Cellar/nss/3.129/lib/libnss3.dylib",
+      "/opt/homebrew/Cellar/nss/3.129/lib/libnssutil3.dylib",
+      "/opt/homebrew/Cellar/nss/3.129/lib/libsmime3.dylib",
+      "/opt/homebrew/Cellar/nss/3.129/lib/libssl3.dylib",
+      "/opt/homebrew/Cellar/openjpeg/2.5.4/lib/libopenjp2.2.5.4.dylib",
+      "/opt/homebrew/Cellar/pcre2/10.49/lib/libpcre2-8.0.dylib",
+      "/opt/homebrew/Cellar/poppler/26.09.0/bin/pdftotext",
+      "/opt/homebrew/Cellar/poppler/26.09.0/lib/libpoppler.164.0.0.dylib",
+      "/opt/homebrew/Cellar/webp/1.6.0/lib/libsharpyuv.0.1.2.dylib",
+      "/opt/homebrew/Cellar/webp/1.6.0/lib/libwebp.7.2.0.dylib",
+      "/opt/homebrew/Cellar/xz/5.8.4/lib/liblzma.5.dylib",
+      "/opt/homebrew/Cellar/zstd/1.5.7_1/lib/libzstd.1.5.7.dylib"
+    ]
+  },
+  "verification": {
+    "go": {
+      "inputs_passed": 10,
+      "quarters_verified": 93,
+      "edge_and_failure_checks": 3
+    },
+    "rust": {
+      "inputs_passed": 10,
+      "quarters_verified": 93,
+      "edge_and_failure_checks": 3
+    },
+    "julia": {
+      "inputs_passed": 10,
+      "quarters_verified": 93,
+      "edge_and_failure_checks": 3
+    }
+  },
+  "pdf_quarters_cross_checked_against_existing_export": 71,
+  "build_seconds_with_existing_cache": {
+    "go": 0.3430604999884963,
+    "rust": 1.9613558749988442
+  },
+  "observed_run_seconds": {
+    "go": {
+      "revenue_export.csv": 0.29978412498894613,
+      "Rev_by_Mkt_Qtrly_Trend_Q123.pdf": 0.021276332990964875,
+      "Rev_by_Mkt_Qtrly_Trend_Q125.pdf": 0.017954666996956803,
+      "Rev_by_Mkt_Qtrly_Trend_Q126.pdf": 0.016591083011007868,
+      "Rev_by_Mkt_Qtrly_Trend_Q225.pdf": 0.016038708010455593,
+      "Rev_by_Mkt_Qtrly_Trend_Q226.pdf": 0.014912833998096175,
+      "Rev_by_Mkt_Qtrly_Trend_Q325.pdf": 0.014677083003334701,
+      "Rev_by_Mkt_Qtrly_Trend_Q326.pdf": 0.014541249998728745,
+      "Rev_by_Mkt_Qtrly_Trend_Q424.pdf": 0.015130333995330147,
+      "Rev_by_Mkt_Qtrly_Trend_Q425.pdf": 0.014783999999053776
+    },
+    "rust": {
+      "revenue_export.csv": 0.2647621249925578,
+      "Rev_by_Mkt_Qtrly_Trend_Q123.pdf": 0.026990999991539866,
+      "Rev_by_Mkt_Qtrly_Trend_Q125.pdf": 0.01969145798648242,
+      "Rev_by_Mkt_Qtrly_Trend_Q126.pdf": 0.01622637500986457,
+      "Rev_by_Mkt_Qtrly_Trend_Q225.pdf": 0.014796874995226972,
+      "Rev_by_Mkt_Qtrly_Trend_Q226.pdf": 0.014169332993333228,
+      "Rev_by_Mkt_Qtrly_Trend_Q325.pdf": 0.014199417011695914,
+      "Rev_by_Mkt_Qtrly_Trend_Q326.pdf": 0.014141666993964463,
+      "Rev_by_Mkt_Qtrly_Trend_Q424.pdf": 0.014103916997555643,
+      "Rev_by_Mkt_Qtrly_Trend_Q425.pdf": 0.013944958001957275
+    },
+    "julia": {
+      "revenue_export.csv": 5.725086250007735,
+      "Rev_by_Mkt_Qtrly_Trend_Q123.pdf": 0.7996947909996379,
+      "Rev_by_Mkt_Qtrly_Trend_Q125.pdf": 0.8034081669902662,
+      "Rev_by_Mkt_Qtrly_Trend_Q126.pdf": 0.7962744579999708,
+      "Rev_by_Mkt_Qtrly_Trend_Q225.pdf": 0.7966476659930777,
+      "Rev_by_Mkt_Qtrly_Trend_Q226.pdf": 0.7973300830053631,
+      "Rev_by_Mkt_Qtrly_Trend_Q325.pdf": 0.7952806669927668,
+      "Rev_by_Mkt_Qtrly_Trend_Q326.pdf": 0.7944522089965176,
+      "Rev_by_Mkt_Qtrly_Trend_Q424.pdf": 0.7985340000013821,
+      "Rev_by_Mkt_Qtrly_Trend_Q425.pdf": 0.8008522920135874
+    }
+  },
+  "measurement": "Logical regular-file bytes; compiler toolchains, OS libraries, inputs and outputs excluded. Julia uses the entire official runtime, not an AOT/trimmed build. PDF dependency closure includes pdftotext and all non-system linked libraries. No third-party language packages.",
+  "scope": "CSV and page-one PDF input, segment validation, total revenue QoQ, one stacked SVG chart. Excludes SQLite, downloads/releases, eight additional charts and PNG rendering."
+}

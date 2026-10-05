@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-06",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "scope": "Full Rust CLI: extract eight-quarter PDF and render all nine PNG charts; includes startup and waited-for pdftotext child",
+  "runs": 15,
+  "warmups": 2,
+  "release_binary_bytes": 1783232,
+  "release_binary_sha256": "95a83b9a7fb19ce0b88496d132d61a9d1d302db91a63c46cffac23d16c365971",
+  "median": {
+    "wall_seconds": 0.2185873749986058,
+    "user_cpu_seconds": 0.20693499999999998,
+    "system_cpu_seconds": 0.007845999999999999,
+    "total_cpu_seconds": 0.214523,
+    "peak_rss_bytes": 22233088
+  },
+  "raw_samples": [
+    {
+      "wall_seconds": 0.21814508299576119,
+      "user_cpu_seconds": 0.20576899999999998,
+      "system_cpu_seconds": 0.007823,
+      "total_cpu_seconds": 0.21359199999999998,
+      "peak_rss_bytes": 22183936
+    },
+    {
+      "wall_seconds": 0.21810787499998696,
+      "user_cpu_seconds": 0.205841,
+      "system_cpu_seconds": 0.007814,
+      "total_cpu_seconds": 0.21365499999999998,
+      "peak_rss_bytes": 22183936
+    },
+    {
+      "wall_seconds": 0.2183694999985164,
+      "user_cpu_seconds": 0.206109,
+      "system_cpu_seconds": 0.007845999999999999,
+      "total_cpu_seconds": 0.21395499999999998,
+      "peak_rss_bytes": 22282240
+    },
+    {
+      "wall_seconds": 0.21970579199842177,
+      "user_cpu_seconds": 0.20768999999999999,
+      "system_cpu_seconds": 0.007965999999999999,
+      "total_cpu_seconds": 0.215656,
+      "peak_rss_bytes": 22265856
+    },
+    {
+      "wall_seconds": 0.21586212501279078,
+      "user_cpu_seconds": 0.20408199999999999,
+      "system_cpu_seconds": 0.008126999999999999,
+      "total_cpu_seconds": 0.21220899999999998,
+      "peak_rss_bytes": 22102016
+    },
+    {
+      "wall_seconds": 0.2185873749986058,
+      "user_cpu_seconds": 0.20693499999999998,
+      "system_cpu_seconds": 0.007587999999999999,
+      "total_cpu_seconds": 0.214523,
+      "peak_rss_bytes": 22118400
+    },
+    {
+      "wall_seconds": 0.2177659169974504,
+      "user_cpu_seconds": 0.206099,
+      "system_cpu_seconds": 0.007744,
+      "total_cpu_seconds": 0.213843,
+      "peak_rss_bytes": 22298624
+    },
+    {
+      "wall_seconds": 0.22129699999641161,
+      "user_cpu_seconds": 0.20838399999999999,
+      "system_cpu_seconds": 0.008714999999999999,
+      "total_cpu_seconds": 0.217099,
+      "peak_rss_bytes": 22151168
+    },
+    {
+      "wall_seconds": 0.21938583299925085,
+      "user_cpu_seconds": 0.207448,
+      "system_cpu_seconds": 0.007756,
+      "total_cpu_seconds": 0.215204,
+      "peak_rss_bytes": 22249472
+    },
+    {
+      "wall_seconds": 0.2173420420003822,
+      "user_cpu_seconds": 0.20555299999999999,
+      "system_cpu_seconds": 0.007761,
+      "total_cpu_seconds": 0.21331399999999998,
+      "peak_rss_bytes": 22200320
+    },
+    {
+      "wall_seconds": 0.22003637500165496,
+      "user_cpu_seconds": 0.207778,
+      "system_cpu_seconds": 0.007856,
+      "total_cpu_seconds": 0.215634,
+      "peak_rss_bytes": 22249472
+    },
+    {
+      "wall_seconds": 0.21813804199337028,
+      "user_cpu_seconds": 0.206029,
+      "system_cpu_seconds": 0.007770999999999999,
+      "total_cpu_seconds": 0.2138,
+      "peak_rss_bytes": 22118400
+    },
+    {
+      "wall_seconds": 0.22296383400680497,
+      "user_cpu_seconds": 0.21054199999999998,
+      "system_cpu_seconds": 0.008378,
+      "total_cpu_seconds": 0.21891999999999998,
+      "peak_rss_bytes": 22282240
+    },
+    {
+      "wall_seconds": 0.22755912500724662,
+      "user_cpu_seconds": 0.214309,
+      "system_cpu_seconds": 0.009167999999999999,
+      "total_cpu_seconds": 0.223477,
+      "peak_rss_bytes": 22233088
+    },
+    {
+      "wall_seconds": 0.23487529199337587,
+      "user_cpu_seconds": 0.219931,
+      "system_cpu_seconds": 0.009809,
+      "total_cpu_seconds": 0.22974,
+      "peak_rss_bytes": 22233088
+    }
+  ],
+  "method": "Sequential fresh processes with warm input/output caches. wait4 user+system CPU includes waited-for child; ru_maxrss is largest individual process peak, not summed process-tree memory. Python harness and compiler resources excluded.",
+  "input": "data/Rev_by_Mkt_Qtrly_Trend_Q326.pdf",
+  "commands": [
+    "cargo build --release --locked",
+    "python3 experiments/language-size/benchmark_resources.py --production-rust"
+  ],
+  "native_libraries": {
+    "bytes": 1783232,
+    "files": [
+      "/Users/ruchernchong/Projects/nvidia-quarterly-revenue/target/release/nvidia-revenue"
+    ]
+  }
+}
