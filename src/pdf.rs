@@ -204,6 +204,9 @@ mod tests {
         assert!(parse_table(&table().replace("Q2 FY26", "Q1 FY26")).is_err());
         assert!(parse_table(&format!("{}Gaming 4 2\n", table())).is_err());
         assert!(parse_table(&table().replace("Gaming 4 2", "Gaming 99 4 2")).is_err());
+        assert!(parse_table(&table().replace("Gaming 4 2", "Gaming 4")).is_err());
+        assert!(parse_table(&table().replace("Gaming 4 2", "Gaming 4 N/A")).is_err());
+        assert!(parse_table(&table().replace("Gaming 4 2", "Gaming -4 2")).is_err());
     }
 
     #[test]

@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result, bail, ensure};
 use plotters::{
     coord::{Shift, types::RangedCoordf64},
     prelude::*,
@@ -44,6 +44,14 @@ pub fn generate(rows: &[RevenueRow], output_dir: &Path) -> Result<Vec<PathBuf>> 
     if rows.is_empty() {
         bail!("cannot generate charts without revenue data");
     }
+    for row in rows {
+        row.validate()?;
+    }
+    ensure!(
+        rows.windows(2)
+            .all(|pair| period(&pair[0]) < period(&pair[1])),
+        "chart quarters must be unique and in chronological order"
+    );
     fs::create_dir_all(output_dir)
         .with_context(|| format!("create chart directory {}", output_dir.display()))?;
     let mut outputs = Vec::new();
@@ -154,7 +162,7 @@ fn previous(rows: &[RevenueRow], index: usize, lag: i64) -> Option<&RevenueRow> 
     rows[..index].iter().rev().find(|row| period(row) == target)
 }
 
-fn growth_series(rows: &[RevenueRow], lag: i64) -> (Vec<String>, Vec<[f64; 5]>) {
+fn growth_series(rows: &[RevenueRow], lag: i64) -> (Vec<String>, Vec<[Option<f64>; 5]>) {
     let mut quarters = Vec::new();
     let mut data = Vec::new();
     for (index, row) in rows.iter().enumerate() {
@@ -165,15 +173,13 @@ fn growth_series(rows: &[RevenueRow], lag: i64) -> (Vec<String>, Vec<[f64; 5]>) 
         quarters.push(row.quarter.clone());
         let values = row.values();
         data.push(std::array::from_fn(|segment| {
-            prior.map_or(0.0, |prior| {
-                crate::growth_rate(values[segment], prior.values()[segment])
-            })
+            prior.and_then(|prior| crate::growth_rate(values[segment], prior.values()[segment]))
         }));
     }
     (quarters, data)
 }
 
-fn contribution_series(rows: &[RevenueRow]) -> (Vec<String>, Vec<[f64; 5]>) {
+fn contribution_series(rows: &[RevenueRow]) -> (Vec<String>, Vec<[Option<f64>; 5]>) {
     let mut quarters = Vec::new();
     let mut data = Vec::new();
     for (index, row) in rows.iter().enumerate().skip(1) {
@@ -185,11 +191,7 @@ fn contribution_series(rows: &[RevenueRow]) -> (Vec<String>, Vec<[f64; 5]>) {
         let change = values[5] - old[5];
         quarters.push(row.quarter.clone());
         data.push(std::array::from_fn(|segment| {
-            if change == 0.0 {
-                0.0
-            } else {
-                (values[segment] - old[segment]) / change * 100.0
-            }
+            (change != 0.0).then(|| (values[segment] - old[segment]) / change * 100.0)
         }));
     }
     (quarters, data)
@@ -202,9 +204,7 @@ fn cagr_series(rows: &[RevenueRow]) -> Vec<[Option<f64>; 6]> {
             let values = row.values();
             let elapsed = period(row) - period(&rows[0]);
             std::array::from_fn(|segment| {
-                if elapsed == 0 || baseline[segment] <= 0.0 {
-                    Some(0.0)
-                } else if values[segment] < 0.0 || elapsed < 0 {
+                if elapsed <= 0 || baseline[segment] <= 0.0 || values[segment] < 0.0 {
                     None
                 } else {
                     let cagr = ((values[segment] / baseline[segment]).powf(4.0 / elapsed as f64)
@@ -413,11 +413,8 @@ fn revenue_trend(rows: &[RevenueRow], path: &Path) -> Result<()> {
         &root,
         "NVIDIA Quarterly Revenue: Segment Breakdown & Total Trend",
         5,
-        &[
-            ("Total Revenue", COLOURS[5]),
-            ("Data Centre midpoint", GOLD),
-        ],
-        "Labels show Q/Q growth; the gold line sits at half Data Centre revenue.",
+        &[("Total Revenue", COLOURS[5]), ("Data Centre Revenue", GOLD)],
+        "Lines show actual revenue; labels show Q/Q growth, with N/A for undefined comparisons.",
     )?;
     let data = rows.iter().map(RevenueRow::values).collect::<Vec<_>>();
     let extremes = data.iter().flat_map(|values| {
@@ -470,30 +467,29 @@ fn revenue_trend(rows: &[RevenueRow], path: &Path) -> Result<()> {
         &mut chart,
         data.iter()
             .enumerate()
-            .map(|(i, values)| (i as f64, values[0] / 2.0)),
+            .map(|(i, values)| (i as f64, values[0])),
         GOLD,
         3,
     )?;
     for (index, row) in rows.iter().enumerate() {
         let prior = previous(rows, index, 1);
-        let total_growth = prior.map_or(0.0, |prior| {
+        let total_growth = prior.and_then(|prior| {
             crate::growth_rate(row.total_revenue as f64, prior.total_revenue as f64)
         });
-        let dc_growth = prior.map_or(0.0, |prior| {
-            crate::growth_rate(row.data_center as f64, prior.data_center as f64)
-        });
+        let dc_growth = prior
+            .and_then(|prior| crate::growth_rate(row.data_center as f64, prior.data_center as f64));
         chart.draw_series(std::iter::once(
             EmptyElement::at((index as f64, data[index][5]))
                 + Text::new(
-                    format!("{total_growth:+.1}%"),
+                    crate::format_growth(total_growth),
                     (0, -22),
                     centred(18, &COLOURS[5]),
                 ),
         ))?;
         chart.draw_series(std::iter::once(
-            EmptyElement::at((index as f64, data[index][0] / 2.0))
+            EmptyElement::at((index as f64, data[index][0]))
                 + Text::new(
-                    format!("{dc_growth:+.1}%"),
+                    crate::format_growth(dc_growth),
                     (0, 22),
                     centred(18, &COLOURS[5]),
                 ),
@@ -514,7 +510,7 @@ fn market_share(rows: &[RevenueRow], path: &Path) -> Result<()> {
     root.fill(&WHITE)?;
     let area = header(
         &root,
-        "NVIDIA Quarterly Revenue: Market Share by Segment",
+        "NVIDIA Quarterly Revenue: Revenue Mix by Segment",
         5,
         &[],
         "",
@@ -588,7 +584,7 @@ fn stacked_area(rows: &[RevenueRow], path: &Path) -> Result<()> {
     root.fill(&WHITE)?;
     let area = header(
         &root,
-        "NVIDIA Revenue: Market Share Evolution (100% Stacked)",
+        "NVIDIA Revenue: Revenue Mix Evolution (100% Stacked)",
         5,
         &[],
         "Percentages use reported total revenue; zero-total quarters have zero share.",
@@ -597,7 +593,7 @@ fn stacked_area(rows: &[RevenueRow], path: &Path) -> Result<()> {
         .iter()
         .map(|row| row.quarter.clone())
         .collect::<Vec<_>>();
-    let mut chart = make_chart(&area, rows.len(), 0.0..100.0, "Market share (%)", &quarters)?;
+    let mut chart = make_chart(&area, rows.len(), 0.0..100.0, "Revenue mix (%)", &quarters)?;
     let shares = rows.iter().map(percentages).collect::<Vec<_>>();
     let mut lower = vec![0.0; rows.len()];
     for (segment, colour) in COLOURS.iter().copied().enumerate().take(5) {
@@ -690,7 +686,7 @@ fn line_chart(
 
 fn grouped_bars(
     quarters: &[String],
-    data: &[[f64; 5]],
+    data: &[[Option<f64>; 5]],
     title: &str,
     ylabel: &str,
     contribution: bool,
@@ -699,9 +695,9 @@ fn grouped_bars(
     let root = BitMapBackend::new(path, (width(quarters.len()), 880)).into_drawing_area();
     root.fill(&WHITE)?;
     let note = if contribution {
-        "Contributions use the signed change in total revenue; zero total change gives zero."
+        "Contributions use signed total revenue change; N/A means zero total change."
     } else {
-        "Missing comparisons and zero prior revenue use zero growth."
+        "N/A means a missing comparison or zero prior revenue; zero growth is a defined comparison."
     };
     let area = header(&root, title, 5, &[], note)?;
     if data.is_empty() {
@@ -713,17 +709,28 @@ fn grouped_bars(
         ))?;
     } else {
         let y_range = range(
-            data.iter().flatten().copied(),
+            data.iter().flatten().copied().flatten(),
             contribution.then_some(100.0),
         );
         let mut chart = make_chart(&area, quarters.len(), y_range, ylabel, quarters)?;
         for (index, values) in data.iter().enumerate() {
             for (segment, value) in values.iter().copied().enumerate() {
                 let left = index as f64 - 0.375 + segment as f64 * 0.15;
-                chart.draw_series(std::iter::once(Rectangle::new(
-                    [(left, 0.0), (left + 0.14, value)],
-                    COLOURS[segment].filled(),
-                )))?;
+                if let Some(value) = value {
+                    chart.draw_series(std::iter::once(Rectangle::new(
+                        [(left, 0.0), (left + 0.14, value)],
+                        COLOURS[segment].filled(),
+                    )))?;
+                } else {
+                    chart.draw_series(std::iter::once(
+                        EmptyElement::at((left + 0.07, 0.0))
+                            + Text::new(
+                                "N/A",
+                                (0, -12 - (segment % 2) as i32 * 16),
+                                centred(12, &COLOURS[segment]),
+                            ),
+                    ))?;
+                }
             }
         }
         chart.draw_series(std::iter::once(PathElement::new(
@@ -747,7 +754,7 @@ mod tests {
 
     fn row(year: i32, quarter: u8, values: [i64; 6]) -> RevenueRow {
         RevenueRow {
-            quarter: format!("Q{quarter} FY{year}"),
+            quarter: format!("Q{quarter} FY{:02}", year % 100),
             fiscal_year: year,
             quarter_number: quarter,
             data_center: values[0],
@@ -766,23 +773,29 @@ mod tests {
             row(2025, 2, [120, 15, 10, 10, 15, 170]),
         ];
         let (_, growth) = growth_series(&rows, 1);
-        assert_eq!(growth[0], [0.0; 5]);
-        assert_eq!(growth[1], [20.0, -25.0, 0.0, 100.0, 0.0]);
+        assert_eq!(growth[0], [None; 5]);
+        assert_eq!(
+            growth[1],
+            [Some(20.0), Some(-25.0), Some(0.0), Some(100.0), Some(0.0)]
+        );
         let (_, contribution) = contribution_series(&rows);
-        assert_eq!(contribution[0], [100.0, -25.0, 0.0, 25.0, 0.0]);
-        assert_eq!(contribution[0].iter().sum::<f64>(), 100.0);
+        assert_eq!(
+            contribution[0],
+            [Some(100.0), Some(-25.0), Some(0.0), Some(25.0), Some(0.0)]
+        );
+        assert_eq!(contribution[0].iter().flatten().sum::<f64>(), 100.0);
     }
 
     #[test]
     fn annual_growth_uses_fiscal_quarters_even_with_missing_rows() {
         let rows = [row(2025, 1, [100; 6]), row(2026, 1, [200; 6])];
         let (quarters, growth) = growth_series(&rows, 4);
-        assert_eq!(quarters, ["Q1 FY2026"]);
-        assert_eq!(growth, [[100.0; 5]]);
+        assert_eq!(quarters, ["Q1 FY26"]);
+        assert_eq!(growth, [[Some(100.0); 5]]);
         let cagr = cagr_series(&rows);
         assert_eq!(cagr[1], [Some(100.0); 6]);
         assert_eq!(normalized_series(&rows)[1], [Some(200.0); 6]);
-        assert_eq!(growth_series(&rows, 1).1, [[0.0; 5]; 2]);
+        assert_eq!(growth_series(&rows, 1).1, [[None; 5]; 2]);
         assert!(contribution_series(&rows).1.is_empty());
     }
 
@@ -791,14 +804,9 @@ mod tests {
         let rows = [row(2025, 1, [0; 6]), row(2025, 2, [100, -100, 0, 0, 0, 0])];
         assert_eq!(percentages(&rows[0]), [0.0; 5]);
         assert_eq!(normalized_series(&rows), [[None; 6]; 2]);
-        assert_eq!(growth_series(&rows, 1).1, [[0.0; 5]; 2]);
-        assert_eq!(contribution_series(&rows).1, [[0.0; 5]]);
-        assert!(
-            cagr_series(&rows)
-                .iter()
-                .flatten()
-                .all(|value| value.is_some_and(f64::is_finite))
-        );
+        assert_eq!(growth_series(&rows, 1).1, [[None; 5]; 2]);
+        assert_eq!(contribution_series(&rows).1, [[None; 5]]);
+        assert_eq!(cagr_series(&rows), [[None; 6]; 2]);
     }
 
     #[test]
@@ -811,6 +819,29 @@ mod tests {
         let data = cagr_series(&rows);
         assert!((data[1][0].unwrap() - 107.36).abs() < 1e-9);
         assert_eq!(data[2], [None; 6]);
+    }
+
+    #[test]
+    fn chart_validation_rejects_bad_rows_before_creating_output() {
+        let dir = tempfile::tempdir().unwrap();
+        let output = dir.path().join("charts");
+        let valid = row(2025, 1, [10, 2, 1, 1, 1, 15]);
+        let invalid = row(2025, 2, [10, 2, 1, 1, 1, 99]);
+        assert!(generate(&[valid.clone(), invalid], &output).is_err());
+        assert!(generate(&[valid.clone(), valid.clone()], &output).is_err());
+        let later = row(2025, 2, [20, 2, 1, 1, 1, 25]);
+        assert!(generate(&[later, valid], &output).is_err());
+        assert!(!output.exists());
+    }
+
+    #[test]
+    fn zero_total_change_with_offsetting_segments_is_undefined() {
+        let rows = [
+            row(2025, 1, [100, 20, 10, 5, 15, 150]),
+            row(2025, 2, [110, 10, 10, 5, 15, 150]),
+        ];
+        assert_eq!(contribution_series(&rows).1, [[None; 5]]);
+        assert_eq!(cagr_series(&rows)[0], [None; 6]);
     }
 
     #[test]

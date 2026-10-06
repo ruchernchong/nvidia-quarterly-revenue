@@ -110,15 +110,15 @@ Analysis prints quarter-over-quarter growth and writes the nine chart PNGs to `c
 
 ![NVIDIA Revenue Trend](charts/nvidia-revenue-trend.png)
 
-Stacked bars show market-segment revenue, with total and Data Centre trends and growth annotations.
+Stacked bars show market-segment revenue, with total and Data Centre lines plotted at their actual revenue values. Labels show Q/Q growth, or N/A when the comparison is undefined.
 
-### 2. Market Share Analysis
+### 2. Revenue Mix Analysis
 
 ![Market Share Chart](charts/market_share_chart.png)
 
 Quarterly donut charts show the percentage of revenue from each segment.
 
-### 3. Market Share Evolution
+### 3. Revenue Mix Evolution
 
 ![Stacked Area Chart](charts/stacked_area_chart.png)
 
@@ -134,7 +134,7 @@ Separate lines show the absolute revenue trajectory of each segment.
 
 ![Q/Q Growth Rate](charts/growth_rate_qoq.png)
 
-Grouped bars compare Q/Q growth across market segments.
+Grouped bars compare Q/Q growth across market segments. Missing comparisons and zero prior revenue are marked N/A rather than zero growth.
 
 ### 6. Year-over-Year Growth Comparison
 
@@ -146,13 +146,13 @@ Grouped bars compare each quarter with the same fiscal quarter a year earlier.
 
 ![CAGR Chart](charts/cagr_chart.png)
 
-Lines show annualised growth from the baseline quarter to each subsequent quarter.
+Lines show annualised growth from the baseline quarter to each subsequent quarter. The baseline itself and segments with zero baseline revenue are undefined and omitted.
 
 ### 8. Growth Contribution Analysis
 
 ![Revenue Contribution](charts/revenue_contribution.png)
 
-Segment contributions explain the change in total revenue between quarters.
+Segment contributions explain the signed change in total revenue between quarters. When total revenue is unchanged, percentage contributions are marked N/A.
 
 ### 9. Indexed Growth Comparison
 

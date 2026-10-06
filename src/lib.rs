@@ -102,12 +102,17 @@ pub fn parse_quarter(label: &str) -> Result<(i32, u8)> {
     Ok((2000 + year.parse::<i32>()?, q))
 }
 
-pub fn growth_rate(current: f64, previous: f64) -> f64 {
-    if previous == 0.0 {
-        0.0
-    } else {
-        (current - previous) / previous * 100.0
+/// Percentage change is undefined for zero or invalid prior revenue.
+pub fn growth_rate(current: f64, previous: f64) -> Option<f64> {
+    if !current.is_finite() || !previous.is_finite() || current < 0.0 || previous <= 0.0 {
+        return None;
     }
+    let rate = (current - previous) / previous * 100.0;
+    rate.is_finite().then_some(rate)
+}
+
+pub fn format_growth(rate: Option<f64>) -> String {
+    rate.map_or_else(|| "N/A".into(), |rate| format!("{rate:+.2}%"))
 }
 
 #[cfg(test)]
@@ -125,8 +130,15 @@ mod tests {
 
     #[test]
     fn positive_negative_and_zero_growth() {
-        assert_eq!(growth_rate(125.0, 100.0), 25.0);
-        assert_eq!(growth_rate(75.0, 100.0), -25.0);
-        assert_eq!(growth_rate(100.0, 0.0), 0.0);
+        assert_eq!(growth_rate(125.0, 100.0), Some(25.0));
+        assert_eq!(growth_rate(75.0, 100.0), Some(-25.0));
+        assert_eq!(growth_rate(100.0, 0.0), None);
+        assert_eq!(growth_rate(0.0, 0.0), None);
+        assert_eq!(growth_rate(100.0, 100.0), Some(0.0));
+        assert_eq!(growth_rate(0.0, 100.0), Some(-100.0));
+        assert_eq!(growth_rate(f64::NAN, 100.0), None);
+        assert_eq!(growth_rate(100.0, f64::INFINITY), None);
+        assert_eq!(format_growth(None), "N/A");
+        assert_eq!(format_growth(Some(25.0)), "+25.00%");
     }
 }

@@ -1,6 +1,8 @@
 use anyhow::{Context, Result, ensure};
 use clap::{Args, Parser, Subcommand};
-use nvidia_quarterly_revenue::{charts, database::Database, download, growth_rate, pdf, release};
+use nvidia_quarterly_revenue::{
+    charts, database::Database, download, format_growth, growth_rate, pdf, release,
+};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -82,9 +84,18 @@ fn analyse(args: AnalyseArgs) -> Result<()> {
     let rows = pdf::extract_data_from_pdf(&path)?;
     for pair in rows.windows(2) {
         println!(
-            "{}: {:+.2}%",
+            "{}: {}",
             pair[1].quarter,
-            growth_rate(pair[1].total_revenue as f64, pair[0].total_revenue as f64)
+            format_growth(
+                ((pair[1].fiscal_year * 4 + i32::from(pair[1].quarter_number))
+                    - (pair[0].fiscal_year * 4 + i32::from(pair[0].quarter_number))
+                    == 1)
+                    .then(|| growth_rate(
+                        pair[1].total_revenue as f64,
+                        pair[0].total_revenue as f64
+                    ))
+                    .flatten()
+            )
         );
     }
     for file in charts::generate(&rows, &args.output_dir)? {
